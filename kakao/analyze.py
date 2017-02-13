@@ -2,7 +2,7 @@ import os
 from konlpy.tag import Kkma
 
 def generater(target_path):
-    target_list = [f for f in os.listdir(target_path) if ".csv" in f]
+    target_list = [f for f in os.listdir(target_path) if ".csv" in f or ".txt" in f]
     print target_list
     kkma = Kkma()
     file_write_1 = open("language_model_1_gram.txt", 'w')
@@ -13,6 +13,16 @@ def generater(target_path):
     for target in target_list:
         with open(target_path+target, 'r') as file_read:
             for line in file_read:
+                if line[0] == '-':
+                    continue
+                else:
+                    splitted = line.split(']')
+                    if len(splitted) != 3:
+                        continue
+                    else:
+                        if '(' in splitted[2] or ')' in splitted[2]:
+                            continue
+                line = splitted[2].strip()
                 try:
                     item_list = kkma.pos(line.decode('utf-8'))
                 except Exception as e:
@@ -41,3 +51,6 @@ def generater(target_path):
         file_write_1.write(key + ':' + str(value) + "\n")
     for key, value in language_model_2_gram.iteritems():
         file_write_2.write(key + ':' + str(value) + "\n")
+
+    file_write_1.close()
+    file_write_2.close()
