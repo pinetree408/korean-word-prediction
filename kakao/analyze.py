@@ -7,9 +7,12 @@ def generater(target_path):
     kkma = Kkma()
     file_write_1 = open("language_model_1_gram.txt", 'w')
     file_write_2 = open("language_model_2_gram.txt", 'w')
+    file_write_3 = open("language_model_3_gram.txt", 'w')
 
     language_model_1_gram = {}
     language_model_2_gram = {}
+    language_model_3_gram = {}
+
     for target in target_list:
         with open(target_path+target, 'r') as file_read:
             for line in file_read:
@@ -47,10 +50,23 @@ def generater(target_path):
                         else:
                             language_model_2_gram[bi_item] = 1
 
+                    # 3 gram
+                    if i < len(item_list) - 2:
+                        tri_item = item[0].encode('utf-8') + ' ' + item_list[i+1][0].encode('utf-8') + ' ' + item_list[i+2][0].encode('utf-8')
+                        if tri_item in language_model_3_gram.keys():
+                            updated = language_model_3_gram[tri_item]
+                            del language_model_3_gram[tri_item]
+                            language_model_3_gram[tri_item] = updated + 1
+                        else:
+                            language_model_3_gram[tri_item] = 1
+
     for key, value in language_model_1_gram.iteritems():
         file_write_1.write(key + ':' + str(value) + "\n")
     for key, value in language_model_2_gram.iteritems():
         file_write_2.write(key + ':' + str(value) + "\n")
+    for key, value in language_model_3_gram.iteritems():
+        file_write_3.write(key + ':' + str(value) + "\n")
 
     file_write_1.close()
     file_write_2.close()
+    file_write_3.close()
