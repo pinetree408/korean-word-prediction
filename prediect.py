@@ -4,13 +4,30 @@ from konlpy.tag import Kkma
 import operator
 import os
 
-
 if not "language_model_1_gram.txt" in os.listdir("./"):
     analyze.generater("kakao/")
 print "finish analyze"
 
 input_str = ""
 kkma = Kkma()
+kkma.morphs(u"initialize")
+
+
+print "set lanaguae model unigram"
+language_model_1_gram = {}
+with open("language_model_1_gram.txt", 'r') as file_read:
+    for line in file_read:
+	keys = line.split(':')[0]
+	if len(keys.split(' ')) != 2:
+	    continue
+
+	prev_word = keys
+	value = line.split(':')[1]
+
+	language_model_1_gram[prev_word] = value
+
+sorted_value = sorted(language_model_1_gram.items(), key=operator.itemgetter(1))
+language_model_1_gram = dict(sorted_value)
 
 print "set lanaguae model bigram"
 language_model_2_gram = {}
@@ -28,6 +45,11 @@ with open("language_model_2_gram.txt", 'r') as file_read:
             language_model_2_gram[prev_word][next_word] = value
         else:
             language_model_2_gram[prev_word] = {next_word : value}
+
+for key, value in language_model_2_gram.iteritems():
+    sorted_value = sorted(value.items(), key=operator.itemgetter(1))
+    del language_model_2_gram[key]
+    language_model_2_gram[key] = dict(sorted_value)
 
 print "set lanaguae model trigram"
 language_model_3_gram = {}
@@ -50,13 +72,19 @@ with open("language_model_3_gram.txt", 'r') as file_read:
         else:
             language_model_3_gram[prev_word] = {middle_word : {next_word : value}}
 
+for key, value in language_model_3_gram.iteritems():
+    for key1, value1 in language_model_3_gram[key].iteritems():
+        sorted_value = sorted(value1.items(), key=operator.itemgetter(1))
+        del language_model_3_gram[key][key1]
+        language_model_3_gram[key][key1] = dict(sorted_value)
+
 while True:
     print "--now--" + input_str
     i = raw_input("Enter text (or Enter to quit): ")
     if not i:
         break
     input_word = kkma.morphs(i.decode("utf-8"))
-    prev_word = input_word[-1].encode("utf-8")
+    prev_word = input_word[-1].encode("utf-8") 
 
     pp_word = ''
     if len(input_str) != 0:
@@ -65,24 +93,18 @@ while True:
         else:
             pp_word = input_word[-2].encode("utf-8")
 
-    print pp_word
-
     if pp_word == '':
         result = language_model_2_gram[prev_word]
-        sorted_result = sorted(result.items(), key=operator.itemgetter(1))
     else:
         try:
             result = language_model_3_gram[pp_word][prev_word]
-            sorted_result = sorted(result.items(), key=operator.itemgetter(1))
-        except KeyError as e:
-            result = language_model_2_gram[prev_word]
-            sorted_result = sorted(result.items(), key=operator.itemgetter(1))
+        except KeyError as e1:
+            try:
+                result = language_model_2_gram[prev_word]
+            except KeyError as e2:
+                result = language_model_1_gram
 
     print "--result--"
-    count = 0
-    for key, value in dict(sorted_result).iteritems():
-        if count == 3:
-            break
+    for key, value in result.iteritems():
         print key
-        count += 1
     input_str = input_str + ' ' + i

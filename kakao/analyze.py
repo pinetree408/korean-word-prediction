@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
 import os
 from konlpy.tag import Kkma
+import re
 
 def generater(target_path):
     target_list = [f for f in os.listdir(target_path) if ".csv" in f or ".txt" in f]
@@ -26,6 +28,11 @@ def generater(target_path):
                         if '(' in splitted[2] or ')' in splitted[2]:
                             continue
                 line = splitted[2].strip()
+                reg = re.compile(r"[ 가-힣]+")
+                subed = reg.sub('', line)
+                if len(subed) != 0:
+                    continue
+
                 try:
                     item_list = kkma.pos(line.decode('utf-8'))
                 except Exception as e:
