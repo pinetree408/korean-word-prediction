@@ -3,6 +3,13 @@ import os
 from konlpy.tag import Kkma
 import re
 
+def tag_word_pair(item_list):
+    result = []
+    for item in item_list:
+        result.append(item[0].encode('utf-8') + '/' + item[1].encode('utf-8'))
+    return ' '.join(result)
+
+
 def generater(target_path):
     target_list = [f for f in os.listdir(target_path) if ".csv" in f or ".txt" in f]
     print target_list
@@ -39,7 +46,7 @@ def generater(target_path):
                     continue
                 for i, item in enumerate(item_list):
                     # 1 gram
-                    uni_item = item[0].encode('utf-8')
+                    uni_item = tag_word_pair([item])
                     if uni_item in language_model_1_gram.keys():
                         updated = language_model_1_gram[uni_item]
                         del language_model_1_gram[uni_item]
@@ -49,7 +56,7 @@ def generater(target_path):
 
                     # 2 gram
                     if i != len(item_list) - 1:
-                        bi_item = item[0].encode('utf-8') + ' ' + item_list[i+1][0].encode('utf-8')
+                        bi_item = tag_word_pair([item, item_list[i+1]])
                         if bi_item in language_model_2_gram.keys():
                             updated = language_model_2_gram[bi_item]
                             del language_model_2_gram[bi_item]
@@ -59,7 +66,7 @@ def generater(target_path):
 
                     # 3 gram
                     if i < len(item_list) - 2:
-                        tri_item = item[0].encode('utf-8') + ' ' + item_list[i+1][0].encode('utf-8') + ' ' + item_list[i+2][0].encode('utf-8')
+                        tri_item = tag_word_pair([item, item_list[i+1], item_list[i+2]])
                         if tri_item in language_model_3_gram.keys():
                             updated = language_model_3_gram[tri_item]
                             del language_model_3_gram[tri_item]
