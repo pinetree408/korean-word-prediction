@@ -14,9 +14,10 @@ def generater(target_path):
     target_list = [f for f in os.listdir(target_path) if ".csv" in f or ".txt" in f]
     print target_list
     kkma = Kkma()
-    file_write_1 = open("language_model_1_gram.txt", 'w')
-    file_write_2 = open("language_model_2_gram.txt", 'w')
-    file_write_3 = open("language_model_3_gram.txt", 'w')
+
+    file_write_1 = open("lm/language_model_1_gram.txt", 'w')
+    file_write_2 = open("lm/language_model_2_gram.txt", 'w')
+    file_write_3 = open("lm/language_model_3_gram.txt", 'w')
 
     language_model_1_gram = {}
     language_model_2_gram = {}
