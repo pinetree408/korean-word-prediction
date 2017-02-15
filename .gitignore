@@ -19,4 +19,5 @@ node_modules/
 
 # for this project
 *.txt
+!requirements.txt
 *.csv
