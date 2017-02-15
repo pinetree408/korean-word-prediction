@@ -22,7 +22,7 @@ class Suggest(object):
 
         return result
 
-    def stupid_backoff_iter(self, prevprev, prev, indent_str, iter_count):
+    def stupid_backoff_iter(self, tag, prevprev, prev, indent_str, iter_count):
         if iter_count == self.max_iter:
             return
 
@@ -33,12 +33,15 @@ class Suggest(object):
             return
 
         for key, value in result[0].iteritems():
+            if value['tag'].split('_')[:-1] != tag.split('_')[1:]:
+	        continue
+
             if count == 5:
                 break
             print indent_str + ':' + key + '-' + str(value)
             if not value['tag'].split('_')[-1][:2] in ['JK', 'JX', 'JC', 'EF', 'EC', 'ET', 'EM', 'UN', 'MA']:
                 if not value['tag'] == 'NNG_NNG_NNG':
-	            self.stupid_backoff_iter(prev, key, indent_str + '----', iter_count + 1);
+	            self.stupid_backoff_iter(value['tag'], prev, key, indent_str + '----', iter_count + 1);
             count += 1
 
     def run(self):
@@ -89,5 +92,5 @@ class Suggest(object):
 		    break
 		print '\n' + str(count) + ":" + key + '-' + str(value)
                 if not value['tag'].split('_')[-1][:2] in ['JK', 'JX', 'JC', 'EF', 'EC', 'ET', 'EM', 'UN', 'MA'] and not result[1] == 1:
-                    self.stupid_backoff_iter(prev_word, key, "----", 0)
+                    self.stupid_backoff_iter(value['tag'], prev_word, key, "----", 0)
 		count += 1
