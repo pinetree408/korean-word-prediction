@@ -34,6 +34,15 @@ class KE(object):
         'T', 'd', 'w', 'c', 'z',
         'x', 'v', 'g'
     ]
+    en_jm_list = [
+        '', 'r', 'R', 'rt', 's', 'sw', 'sg', 'e',
+	'E', 'f', 'fr', 'fa', 'fq', 'ft', 'fx', 'fv',
+        'fg', 'a', 'q', 'Q', 'qt', 't', 'T', 'd',
+        'w', 'W', 'c', 'z', 'x', 'v', 'g', 'k',
+        'o', 'i', 'O', 'j', 'p', 'u', 'P', 'h',
+	'hk', 'ho', 'hl', 'y', 'n', 'np', 'nl', 'b',
+	'm', 'ml', 'l'
+    ]
 
     reg_h = "[rRseEfaqQtTdwWczxvg]"
     reg_b = "hk|ho|hl|nj|np|nl|ml|k|o|i|O|j|p|u|P|h|y|n|b|m|l"
@@ -59,12 +68,15 @@ class KE(object):
             len (int): length of target word's letter
         """
         words = self.hangul_reg.sub('', word).decode('utf-8')
-
         result = []
         for word in words:
             char_code = ord(word)
-            print char_code
             if char_code < 44032 or char_code > 55203:
+                char_code = char_code - 12592
+                try:
+                    result.append(self.en_jm_list[char_code])
+                except IndexError as e:
+                    raise IndexError
                 continue
             char_code = char_code - 44032
             en_h_code = char_code / 588
@@ -80,5 +92,35 @@ class KE(object):
                 result.append(en_b_char)
                 if en_f_code != 0:
                     result.append(en_f_char)
-        print result
         return ''.join(result)
+
+    def change_english_to_korean(self, word):
+        length = len(word)
+        temp_word = word
+        result = ''
+        while length != 0:
+            m = re.search(self.regex, temp_word)
+	    if m is None:
+                try:
+                    not_completed = unichr(self.en_jm_list.index(temp_word) + 12592)
+                except ValueError as e:
+                    raise ValueError
+                result = not_completed + result
+                break
+
+            if m.group(0) != None:
+                korean_letter = m.group(0)
+                char_code = self.en_h.index(korean_letter[0]) * 588
+                if len(korean_letter) > 2:
+                    if korean_letter[2] in self.en_f_list:
+                        char_code += self.en_b_list.index(korean_letter[1]) * 28
+                        char_code += self.en_f_list.index(korean_letter[2])
+                    else:
+                        char_code += self.en_b_list.index(korean_letter[1:]) * 28
+                else:
+                    char_code += self.en_b_list.index(korean_letter[1]) * 28
+                char_code += 44032
+                result += unichr(char_code)
+            temp_word = temp_word.replace(m.group(0), '')
+	    length = len(temp_word)
+	return result

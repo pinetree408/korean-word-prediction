@@ -5,7 +5,6 @@ from korean import hangul
 
 def generate():
     ke = hangul.KE()
-    print ke.change_complete_korean('ㄴ다')
 
     print "set lanaguae model unigram"
     language_model_1_gram = {}
@@ -15,9 +14,12 @@ def generate():
             keys = line.split(':')[0]
             if len(keys.split(' ')) != 1:
                 continue
+            try:
+                prev_word = ke.change_complete_korean(keys.split('/')[0])
+                prev_tag = keys.split('/')[1]
+            except IndexError as e:
+                continue
 
-            prev_word = keys.split('/')[0]
-            prev_tag = keys.split('/')[1]
             try:
                 value = int(line.split(':')[1][:-2])
             except ValueError as e:
@@ -37,10 +39,14 @@ def generate():
 	    if len(keys.split(' ')) != 2:
 		continue
 
-            prev_word = keys.split(' ')[0].split('/')[0]
-	    prev_tag = keys.split(' ')[0].split('/')[1]
-	    next_word = keys.split(' ')[1].split('/')[0]
-	    next_tag = keys.split(' ')[1].split('/')[1]
+            try:
+                prev_word = ke.change_complete_korean(keys.split(' ')[0].split('/')[0])
+	        prev_tag = keys.split(' ')[0].split('/')[1]
+	        next_word = ke.change_complete_korean(keys.split(' ')[1].split('/')[0])
+	        next_tag = keys.split(' ')[1].split('/')[1]
+            except IndexError as e:
+                continue
+
 	    value = int(line.split(':')[1][-2])
 
 	    if prev_word in language_model_2_gram.keys():
@@ -61,13 +67,16 @@ def generate():
 	    keys = line.split(':')[0]
 	    if len(keys.split(' ')) != 3:
 		continue
+            try:
+	        prev_word = ke.change_complete_korean(keys.split(' ')[0].split('/')[0])
+	        prev_tag = keys.split(' ')[0].split('/')[1]
+	        middle_word = ke.change_complete_korean(keys.split(' ')[1].split('/')[0])
+	        middle_tag = keys.split(' ')[1].split('/')[1]
+	        next_word = ke.change_complete_korean(keys.split(' ')[2].split('/')[0])
+	        next_tag = keys.split(' ')[2].split('/')[1]
+            except IndexError as e:
+                continue
 
-	    prev_word = keys.split(' ')[0].split('/')[0]
-	    prev_tag = keys.split(' ')[0].split('/')[1]
-	    middle_word = keys.split(' ')[1].split('/')[0]
-	    middle_tag = keys.split(' ')[1].split('/')[1]
-	    next_word = keys.split(' ')[2].split('/')[0]
-	    next_tag = keys.split(' ')[2].split('/')[1]
 	    value = int(line.split(':')[1][-2])
 
 	    if prev_word in language_model_3_gram.keys():
