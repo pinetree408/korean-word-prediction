@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*- 
 import operator
 from collections import OrderedDict
+from korean import hangul
 
 def generate():
+    ke = hangul.KE()
+    print ke.change_complete_korean('ㄴ다')
+
     print "set lanaguae model unigram"
     language_model_1_gram = {}
     

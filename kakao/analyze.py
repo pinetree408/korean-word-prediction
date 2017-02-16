@@ -32,10 +32,9 @@ def generater(target_path):
                     splitted = line.split(']')
                     if len(splitted) != 3:
                         continue
-                    else:
-                        if '(' in splitted[2] or ')' in splitted[2]:
-                            continue
+
                 line = splitted[2].strip()
+
                 reg = re.compile(r"[ 가-힣]+")
                 subed = reg.sub('', line)
                 if len(subed) != 0:
