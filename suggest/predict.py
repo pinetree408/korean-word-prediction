@@ -31,12 +31,10 @@ class Suggest(object):
         result = self.stupid_backoff(prevprev, prev)
 
         count = 0
-        #if result[1] == 1:
-        #    return
 
         for key, value in result[0].iteritems():
-            #if value['tag'].split('_')[:-1] != tag.split('_')[1:]:
-	    #    continue
+            if value['tag'].split('_')[:-1] != tag.split('_')[1:]:
+	        continue
 
             if count == 5:
                 break
@@ -49,8 +47,9 @@ class Suggest(object):
                 for index, item in reversed(list(enumerate(iter_list[-1]))):
                     if item + 1 == iter_count:
 	                korean_word[-1].append(korean_word[-1][index] + key)
+                        break
 
-            iter_list[-1].append(iter_count)        
+            iter_list[-1].append(iter_count)
 
             if not value['tag'].split('_')[-1][:2] in ['JK', 'JX', 'JC', 'EF', 'EC', 'ET', 'EM', 'UN', 'MA', 'MD']:
                 if not value['tag'] == 'NNG_NNG_NNG':
@@ -116,7 +115,7 @@ class Suggest(object):
                 korean_word.append([key])
                 iter_list.append([-1])
                 final_list.append([])
-                if not value['tag'].split('_')[-1][:2] in ['JK', 'JX', 'JC', 'EF', 'EC', 'ET', 'EM', 'UN', 'MA', 'MD'] and not result[1] == 1:
+                if not value['tag'].split('_')[-1][:2] in ['JK', 'JX', 'JC', 'EF', 'EC', 'ET', 'EM', 'UN', 'MA', 'MD']:
                     self.stupid_backoff_iter(value['tag'], prev_word, key, "----", 0, korean_word, iter_list, final_list)
                     if len(final_list[-1]) == 0:
                         final_list[-1].append(key)

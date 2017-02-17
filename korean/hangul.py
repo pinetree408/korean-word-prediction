@@ -69,14 +69,15 @@ class KE(object):
         """
         words = self.hangul_reg.sub('', word).decode('utf-8')
         result = []
+        emo_count = 0
         for word in words:
             char_code = ord(word)
             if char_code < 44032 or char_code > 55203:
                 char_code = char_code - 12592
-                try:
-                    result.append(self.en_jm_list[char_code])
-                except IndexError as e:
+                if emo_count == 1:
                     raise IndexError
+                result.append(self.en_jm_list[char_code])
+                emo_count += 1
                 continue
             char_code = char_code - 44032
             en_h_code = char_code / 588
