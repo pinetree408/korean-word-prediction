@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from konlpy.tag import Kkma
+from konlpy.tag import Kkma, Hannanum
 import re
 
 def tag_word_pair(item_list):
@@ -14,6 +14,7 @@ def generater(target_path):
     target_list = [f for f in os.listdir(target_path) if ".csv" in f or ".txt" in f]
     print target_list
     kkma = Kkma()
+    #hannanum = Hannanum()
 
     file_write_1 = open("lm/language_model_1_gram.txt", 'w')
     file_write_2 = open("lm/language_model_2_gram.txt", 'w')
@@ -42,6 +43,7 @@ def generater(target_path):
 
                 try:
                     item_list = kkma.pos(line.decode('utf-8'))
+                    #item_list = hannanum.pos(line.decode('utf-8'), ntags=22)
                 except Exception as e:
                     continue
                 for i, item in enumerate(item_list):

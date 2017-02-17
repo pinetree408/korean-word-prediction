@@ -106,7 +106,10 @@ class KE(object):
                     not_completed = unichr(self.en_jm_list.index(temp_word) + 12592)
                 except ValueError as e:
                     raise ValueError
-                result = not_completed + result
+                if len(word) < 6:
+                    result = not_completed + result
+                else:
+                    raise ValueError
                 break
 
             if m.group(0) != None:
