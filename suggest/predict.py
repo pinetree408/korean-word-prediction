@@ -109,7 +109,7 @@ class Suggest(object):
 	    prevprev_word = ''
 	    if len(input_str) != 0:
 		if len(input_word) == 1:
-		    prevprev_word = self.ke.change_complete_korean(self.hannanum.morphs(input_str.split(' ')[-1].decode("utf-8"))[-1].encode("utf-8"))
+		    prevprev_word = self.ke.change_complete_korean(self.kkma.morphs(input_str.split(' ')[-1].decode("utf-8"))[-1].encode("utf-8"))
 		else:
 		    prevprev_word = self.ke.change_complete_korean(input_word[-2].encode("utf-8"))
 
