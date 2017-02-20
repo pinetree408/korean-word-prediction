@@ -9,6 +9,13 @@ def tag_word_pair(item_list):
         result.append(item[0].encode('utf-8') + '/' + item[1].encode('utf-8'))
     return ' '.join(result)
 
+def update_dict(dictionary, item):
+    if item in dictionary.keys():
+        updated = dictionary[item]
+        del dictionary[item]
+        dictionary[item] = updated + 1
+    else:
+        dictionary[item] = 1
 
 def generater(target_path):
     target_list = [f for f in os.listdir(target_path) if ".csv" in f or ".txt" in f]
@@ -49,32 +56,17 @@ def generater(target_path):
                 for i, item in enumerate(item_list):
                     # 1 gram
                     uni_item = tag_word_pair([item])
-                    if uni_item in language_model_1_gram.keys():
-                        updated = language_model_1_gram[uni_item]
-                        del language_model_1_gram[uni_item]
-                        language_model_1_gram[uni_item] = updated + 1
-                    else:
-                        language_model_1_gram[uni_item] = 1
+                    update_dict(language_model_1_gram, uni_item)
 
                     # 2 gram
                     if i != len(item_list) - 1:
                         bi_item = tag_word_pair([item, item_list[i+1]])
-                        if bi_item in language_model_2_gram.keys():
-                            updated = language_model_2_gram[bi_item]
-                            del language_model_2_gram[bi_item]
-                            language_model_2_gram[bi_item] = updated + 1
-                        else:
-                            language_model_2_gram[bi_item] = 1
+                        update_dict(language_model_2_gram, bi_item)
 
                     # 3 gram
                     if i < len(item_list) - 2:
                         tri_item = tag_word_pair([item, item_list[i+1], item_list[i+2]])
-                        if tri_item in language_model_3_gram.keys():
-                            updated = language_model_3_gram[tri_item]
-                            del language_model_3_gram[tri_item]
-                            language_model_3_gram[tri_item] = updated + 1
-                        else:
-                            language_model_3_gram[tri_item] = 1
+                        update_dict(language_model_3_gram, tri_item)
 
     for key, value in language_model_1_gram.iteritems():
         file_write_1.write(key + ':' + str(value) + "\n")
