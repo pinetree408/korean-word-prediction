@@ -29,7 +29,8 @@ class Suggest(object):
 
     def stupid_backoff_iter(self, tag, prevprev, prev, indent_str, iter_count, korean_word, iter_list, final_list):
         if iter_count == self.max_iter:
-            final_list[-1].append(korean_word[-1][-1])
+            if not korean_word[-1][-1] in final_list[-1]:
+                final_list[-1].append(korean_word[-1][-1])
             return
 
         result = self.stupid_backoff(prevprev, prev)
@@ -71,7 +72,7 @@ class Suggest(object):
 
             if not value['tag'].split('_')[-1][:2] in ['JK', 'JX', 'JC', 'EF', 'EC', 'ET', 'EM', 'UN', 'MA', 'MD']:
             #if not value['tag'].split('_')[-1] in ['JC', 'JX', 'JP', 'EF', 'EC', 'ET', 'MA', 'MM']:
-                if not value['tag'] == 'NNG_NNG_NNG':
+                if not value['tag'] == 'NNG_NNG_NNG' and not value['tag'] == 'NNG_NNG':
 	            self.stupid_backoff_iter(value['tag'], prev, key, indent_str + '----', iter_count + 1, korean_word, iter_list, final_list);
                 else:
                     if not korean_word[-1][-1] in final_list[-1]:
