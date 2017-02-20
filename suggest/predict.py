@@ -14,6 +14,7 @@ class Suggest(object):
         #self.hannanum.morphs(u"initialize")
         self.max_iter = 10
         self.ke = hangul.KE()
+        self.input_str = ''
 
     def stupid_backoff(self, prevprev_word, prev_word):
         try:
@@ -33,7 +34,8 @@ class Suggest(object):
 
         result = self.stupid_backoff(prevprev, prev)
         if result[1] == 1:
-            final_list[-1].append(korean_word[-1][-1])
+            if not korean_word[-1][-1] in final_list[-1]:
+                final_list[-1].append(korean_word[-1][-1])
             return
 
         count = 0
@@ -146,3 +148,65 @@ class Suggest(object):
                         print "    " + self.ke.change_english_to_korean(item).encode('utf-8')
                     except ValueError as e:
                         continue
+
+    def suggestion(self, i):
+
+	if not i:
+	    return {}
+
+        if i == 'reset':
+            self.input_str = ''
+            return {}
+
+	if self.input_str != '':
+	    self.input_str = self.input_str + ' ' + i
+	else:
+	    self.input_str = i
+
+	input_word = self.kkma.morphs(i)
+	prev_word = self.ke.change_complete_korean(input_word[-1].encode("utf-8"))
+
+	prevprev_word = ''
+	if len(self.input_str) != 0:
+	    if len(input_word) == 1:
+		prevprev_word = self.ke.change_complete_korean(self.kkma.morphs(self.input_str.split(' ')[-1])[-1].encode("utf-8"))
+	    else:
+		prevprev_word = self.ke.change_complete_korean(input_word[-2].encode("utf-8"))
+
+	if prevprev_word == '':
+	    try:
+		result = (self.language_model_2_gram[prev_word], 2)
+	    except KeyError as e1:
+		result = (self.language_model_1_gram, 1)
+	else:
+	    result = self.stupid_backoff(prevprev_word, prev_word)
+
+	count = 0
+	korean_word = []
+	iter_list = []
+	final_list = []
+	for key, value in result[0].iteritems():
+	    if count == 10:
+		break
+	    korean_word.append([key])
+	    iter_list.append([-1])
+	    final_list.append([])
+	    if not value['tag'].split('_')[-1][:2] in ['JK', 'JX', 'JC', 'EF', 'EC', 'ET', 'EM', 'UN', 'MA', 'MD']:
+		self.stupid_backoff_iter(value['tag'], prev_word, key, "----", 0, korean_word, iter_list, final_list)
+	    else:
+                if not key in final_list[-1]:
+		    final_list[-1].append(key)
+	    count += 1
+
+        final_result = {}
+	for i, item_list in enumerate(final_list):
+	    for j, item in enumerate(item_list):
+		try:
+		    changed = self.ke.change_english_to_korean(item)
+		    if i in final_result.keys():
+                        final_result[i].append(changed)
+                    else:
+                        final_result[i] = [changed]
+		except ValueError as e:
+		    continue
+        return final_result

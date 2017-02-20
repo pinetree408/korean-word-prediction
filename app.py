@@ -10,5 +10,5 @@ if not "language_model_1_gram.txt" in os.listdir("lm/"):
     analyze.generater("target/")
 print "finish analyze"
 
-suggest = predict.Suggest(ngram.generate())
-suggest.run()
+#suggest = predict.Suggest(ngram.generate())
+#suggest.run()

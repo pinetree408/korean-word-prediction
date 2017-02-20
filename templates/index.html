@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.6/socket.io.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function(){
+      var socket = io.connect("http://" + document.domain + ":" + location.port + "/mynamespace");
+      socket.on('response', function(msg){
+        if (msg.type == 'System') {
+          $("#system").append('<p> ' + msg.type + ': ' + msg.data + '</p>');
+        } else {
+          $("#input").html(msg.input);
+          var dict = $.parseJSON(msg.data);
+          var output = "<ul id='result_list'>";
+          for (var item in dict) {
+            var subList = dict[item];
+            var subListLen = subList.length;
+            output += "<li id='result_item'><ul>";
+	    for (var j=0; j<subListLen; j++) {
+	      output += "<li>" + subList[j] + "</li>";
+	    }
+	    output += "</ul></li>";
+	  }
+	  output += "</ul>";
+	  $("#suggestion").html(output);
+        }
+      });
+      $("form#broadcast").submit(function(event){
+        if($("#input-data").val() == "") {
+          return false;
+        }
+        socket.emit("request", {data: $("#input-data").val()});
+        $("#input-data").val("");
+        return false;
+      });
+    });
+  </script>
+  <meta charset="UTF-8">
+  <title>websock test</title>
+  <style>
+    #suggestion {
+      width: 100%;
+      height: 500px;
+    }
+    #result_list {
+      list-style: none;
+    }
+    #result_item {
+      float: left;
+    }
+  </style>
+</head>
+<body>
+  <h3>system</h3>
+  <div id="system"></div>
+  <h3>input</h3>
+  <div id="input"></div>
+  <h3>suggestion</h3>
+  <div id="suggestion"></div>
+  <form id="broadcast" action="#">
+    <input id="input-data" type="text"/>
+    <input type="submit"/>
+  </form>
+</body>
+</html>
