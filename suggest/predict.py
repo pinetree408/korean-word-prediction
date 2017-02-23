@@ -87,7 +87,7 @@ class Suggest(object):
 	if not i:
 	    return {}
 
-        if i == 'reset':
+        if i.lower() == 'reset':
             self.input_str = ''
             return {}
 
