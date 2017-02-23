@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head lang="en">
+  <meta name="viewport" content="width=device-width, user-scalable=no">
   <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.6/socket.io.js"></script>
   <script type="text/javascript">
@@ -8,25 +9,36 @@
       var socket = io.connect("http://" + document.domain + ":" + location.port + "/mynamespace");
       socket.on('response', function(msg){
         if (msg.type == 'System') {
-          $("#system").append('<p> ' + msg.type + ': ' + msg.data + '</p>');
+          console.log(msg);
         } else {
-          $("#input").html(msg.input);
+          $("#input-str").html(msg.input);
+
           var dict = $.parseJSON(msg.data);
+
           var output = "<ul id='result_list'>";
+          var count = 0;
           for (var item in dict) {
+            if (count > 2) {
+              break;
+            }
             var subList = dict[item];
             var subListLen = subList.length;
             output += "<li id='result_item'><ul>";
 	    for (var j=0; j<subListLen; j++) {
+              if (j == 3) {
+                break;
+              }
 	      output += "<li>" + subList[j] + "</li>";
 	    }
 	    output += "</ul></li>";
+            count++;
 	  }
 	  output += "</ul>";
 	  $("#suggestion").html(output);
         }
       });
-      $("form#broadcast").submit(function(event){
+      $("#input-data").focus();
+      $("form").submit(function(event){
         if($("#input-data").val() == "") {
           return false;
         }
@@ -34,33 +46,89 @@
         $("#input-data").val("");
         return false;
       });
+      $("#suggestion").on("click", "#result_item li", function(){
+        socket.emit("request", {data: $(this).text()});
+        $("#input-data").val("");
+        $("#input-data").focus();
+      });
     });
   </script>
   <meta charset="UTF-8">
   <title>websock test</title>
   <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+    input {
+      vertical-align:middle;
+    }
+    .content {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      height: 200px;
+      margin-bottom: 10px;
+    }
+    #input-str {
+      width: 100%;
+      height: 50px;
+      overflow: auto;
+      margin: 2px;
+    }
+    .input-container {
+      width: 100%;
+      height: 30px;
+      margin: 2px;
+    }
+    #input-data {
+      width: 73%;
+      height: 26px;
+    }
+    #input-submit {
+      width: 23%;
+      height: 30px;
+      border-radius: 0;
+    }
     #suggestion {
       width: 100%;
-      height: 500px;
+      height: 100px;
+      margin: 2px;
     }
     #result_list {
       list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    #result_list ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
     }
     #result_item {
       float: left;
+      width: 33%;
+    }
+    #result_item li {
+      text-align: center;
+      border: 1px solid black;
+      height: 30px;
+      line-height: 30px;
+      vertical-align: middle;
+      margin: 1px;
     }
   </style>
 </head>
 <body>
-  <h3>system</h3>
-  <div id="system"></div>
-  <h3>input</h3>
-  <div id="input"></div>
-  <h3>suggestion</h3>
-  <div id="suggestion"></div>
-  <form id="broadcast" action="#">
-    <input id="input-data" type="text"/>
-    <input type="submit"/>
-  </form>
+  <div class="content">
+    <div id="input-str"></div>
+    <form action="#">
+      <div class="input-container">
+        <input id="input-data" type="text"/>
+        <input id="input-submit" type="submit" value="보내기"/>
+      </div>
+    </form>
+    <div id="suggestion"></div>
+  </div>
 </body>
 </html>
