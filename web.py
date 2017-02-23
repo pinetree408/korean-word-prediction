@@ -3,7 +3,7 @@ import os
 from flask import Flask, render_template, session
 from flask_socketio import SocketIO, emit
 from suggest import ngram, predict
-from kakao import analyze
+from corpus import analyze
 
 import json
 
@@ -16,7 +16,7 @@ if not os.path.exists('lm/'):
     os.makedirs('lm/')
 
 if not "language_model_1_gram.txt" in os.listdir("lm/"):
-    analyze.generater("target/")
+    analyze.generater("target/", 'kakao')
 print "finish analyze"
 
 

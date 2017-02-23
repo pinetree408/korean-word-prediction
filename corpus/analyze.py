@@ -17,7 +17,7 @@ def update_dict(dictionary, item):
     else:
         dictionary[item] = 1
 
-def generater(target_path):
+def generater(target_path, option):
     target_list = [f for f in os.listdir(target_path) if ".csv" in f or ".txt" in f]
     print target_list
     kkma = Kkma()
@@ -34,14 +34,16 @@ def generater(target_path):
     for target in target_list:
         with open(target_path+target, 'r') as file_read:
             for line in file_read:
-                if line[0] == '-':
-                    continue
-                else:
+
+                if option == 'kakao':
+                    if line[0] == '-':
+                        continue
+                
                     splitted = line.split(']')
                     if len(splitted) != 3:
                         continue
 
-                line = splitted[2].strip()
+                    line = splitted[2].strip()
 
                 reg = re.compile(r"[ 가-힣]+")
                 subed = reg.sub('', line)
