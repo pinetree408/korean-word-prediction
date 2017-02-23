@@ -12,7 +12,6 @@
           console.log(msg);
         } else {
           $("#input-str").html(msg.input);
-
           var dict = $.parseJSON(msg.data);
 
           var output = "<ul id='result_list'>";
@@ -36,8 +35,8 @@
 	  output += "</ul>";
 	  $("#suggestion").html(output);
         }
+        $("#input-data").val("");
       });
-      $("#input-data").focus();
       $("form").submit(function(event){
         if($("#input-data").val() == "") {
           return false;
@@ -51,6 +50,8 @@
         $("#input-data").val("");
         $("#input-data").focus();
       });
+
+      $("#input-data").focus();
     });
   </script>
   <meta charset="UTF-8">
