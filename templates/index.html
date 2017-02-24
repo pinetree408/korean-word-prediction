@@ -4,62 +4,15 @@
   <meta name="viewport" content="width=device-width, user-scalable=no">
   <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.6/socket.io.js"></script>
-  <script type="text/javascript">
-    $(document).ready(function(){
-      var socket = io.connect("http://" + document.domain + ":" + location.port + "/mynamespace");
-      socket.on('response', function(msg){
-        if (msg.type == 'System') {
-          console.log(msg);
-        } else {
-          $("#input-str").html(msg.input);
-          var dict = $.parseJSON(msg.data);
-
-          var output = "<ul id='result_list'>";
-          var count = 0;
-          for (var item in dict) {
-            if (count > 2) {
-              break;
-            }
-            var subList = dict[item];
-            var subListLen = subList.length;
-            output += "<li id='result_item'><ul>";
-	    for (var j=0; j<subListLen; j++) {
-              if (j == 3) {
-                break;
-              }
-	      output += "<li>" + subList[j] + "</li>";
-	    }
-	    output += "</ul></li>";
-            count++;
-	  }
-	  output += "</ul>";
-	  $("#suggestion").html(output);
-        }
-        $("#input-data").val("");
-      });
-      $("form").submit(function(event){
-        if($("#input-data").val() == "") {
-          return false;
-        }
-        socket.emit("request", {data: $("#input-data").val()});
-        $("#input-data").val("");
-        return false;
-      });
-      $("#suggestion").on("click", "#result_item li", function(){
-        socket.emit("request", {data: $(this).text()});
-        $("#input-data").val("");
-        $("#input-data").focus();
-      });
-
-      $("#input-data").focus();
-    });
-  </script>
   <meta charset="UTF-8">
   <title>websock test</title>
   <style>
     * {
       padding: 0;
       margin: 0;
+      -webkit-user-select: none; /* Chrome/Safari */
+      -moz-user-select: none; /* Firefox */
+      -ms-user-select: none; /* IE10+ */
     }
     input {
       vertical-align:middle;
@@ -106,11 +59,11 @@
       padding: 0;
       margin: 0;
     }
-    #result_item {
+    .result_item {
       float: left;
       width: 33%;
     }
-    #result_item li {
+    .result_item li {
       text-align: center;
       border: 1px solid black;
       height: 30px;
@@ -125,11 +78,89 @@
     <div id="input-str"></div>
     <form action="#">
       <div class="input-container">
-        <input id="input-data" type="text"/>
+        <input id="input-data" type="text" autocomplete="off"/>
         <input id="input-submit" type="submit" value="보내기"/>
       </div>
     </form>
     <div id="suggestion"></div>
   </div>
+  <script type="text/javascript">
+    $(document).ready(function(){
+      var socket = io.connect("http://" + document.domain + ":" + location.port + "/mynamespace");
+      socket.on('response', function(msg){
+        if (msg.type == 'System') {
+          console.log(msg);
+        } else {
+          $("#input-str").html(msg.input);
+          var dict = $.parseJSON(msg.data);
+
+          $("#suggestion").off("click");
+          $("#suggestion").off("touchstart");
+          $("#suggestion").off("touchend");
+          var output = "<ul id='result_list'>";
+          var count = 0;
+          for (var item in dict) {
+            if (count > 2) {
+              break;
+            }
+            var subList = dict[item];
+            var subListLen = subList.length;
+            output += "<li class='result_item' " + "id='" + count + "'><ul>";
+            var outputList = [];
+            for (var j=0; j<subListLen; j++) {
+              if (j == 3) {
+                break;
+              } else if (j == 0) {
+	        output += "<li>" + subList[j] + "</li>";
+              } else {
+                outputList.push("<li id='added'>" + subList[j] + "</li>");
+              }
+            }
+
+            if (outputList.length == 0) {
+              $("#suggestion").on("click", "#" + count, function(){
+	        console.log($(this));
+                socket.emit("request", {data: $(this).text()});
+                $("#input-data").val("");
+                $("#input-data").focus();
+              });
+            } else { 
+              $("#suggestion").on("touchstart", "#" + count, {outputList: outputList, count: count}, function(e){
+                for (var i=0; i < e.data.outputList.length; i++) {
+                  $("#" + e.data.count + " ul").append(e.data.outputList[i]);
+                }
+              });
+              $("#suggestion").on("touchend", "#" + count, function(e){
+                var changedTouch = e.originalEvent.changedTouches[0];
+	        var elem = document.elementFromPoint(changedTouch.clientX, changedTouch.clientY);
+                console.log($(elem));
+                console.log($(elem).text());
+                socket.emit("request", {data: $(elem).text()});
+                for (var i=0; i< 2; i++) {
+	          $("#added").remove();
+                }
+                $("#input-data").val("");
+                $("#input-data").focus();
+              });
+	    }
+	    output += "</ul></li>";
+            count++;
+	  }
+	  output += "</ul>";
+	  $("#suggestion").html(output);
+        }
+        $("#input-data").val("");
+      });
+      $("form").submit(function(event){
+        if($("#input-data").val() == "") {
+          return false;
+        }
+        socket.emit("request", {data: $("#input-data").val()});
+        $("#input-data").val("");
+        return false;
+      });
+      $("#input-data").focus();
+    });
+  </script>
 </body>
 </html>
