@@ -97,6 +97,7 @@
           $("#suggestion").off("click");
           $("#suggestion").off("touchstart");
           $("#suggestion").off("touchend");
+
           var output = "<ul id='result_list'>";
           var count = 0;
           for (var item in dict) {
@@ -119,7 +120,6 @@
 
             if (outputList.length == 0) {
               $("#suggestion").on("click", "#" + count, function(){
-	        console.log($(this));
                 socket.emit("request", {data: $(this).text()});
                 $("#input-data").val("");
                 $("#input-data").focus();
@@ -133,10 +133,10 @@
               $("#suggestion").on("touchend", "#" + count, function(e){
                 var changedTouch = e.originalEvent.changedTouches[0];
 	        var elem = document.elementFromPoint(changedTouch.clientX, changedTouch.clientY);
-                console.log($(elem));
-                console.log($(elem).text());
-                socket.emit("request", {data: $(elem).text()});
-                for (var i=0; i< 2; i++) {
+                if ($(elem).attr("id") != "suggestion") {
+                  socket.emit("request", {data: $(elem).text()});
+                }
+                for (var i=0; i < 2; i++) {
 	          $("#added").remove();
                 }
                 $("#input-data").val("");
