@@ -112,7 +112,7 @@
               if (j == 3) {
                 break;
               } else if (j == 0) {
-	        output += "<li>" + subList[j] + "</li>";
+	        output += "<li id='first'>" + subList[j] + "</li>";
               } else {
                 outputList.push("<li id='added'>" + subList[j] + "</li>");
               }
@@ -133,7 +133,8 @@
               $("#suggestion").on("touchend", "#" + count, function(e){
                 var changedTouch = e.originalEvent.changedTouches[0];
 	        var elem = document.elementFromPoint(changedTouch.clientX, changedTouch.clientY);
-                if ($(elem).attr("id") != "suggestion") {
+                var elemId = $(elem).attr("id");
+                if (elemId == "first" || elemId == "added") {
                   socket.emit("request", {data: $(elem).text()});
                 }
                 for (var i=0; i < 2; i++) {
@@ -151,6 +152,7 @@
         }
         $("#input-data").val("");
       });
+
       $("form").submit(function(event){
         if($("#input-data").val() == "") {
           return false;
@@ -159,6 +161,7 @@
         $("#input-data").val("");
         return false;
       });
+
       $("#input-data").focus();
     });
   </script>
