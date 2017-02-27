@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- 
-from konlpy.tag import Kkma, Hannanum
+from konlpy.tag import Kkma
 from korean import hangul
 
 class Suggest(object):
@@ -10,8 +10,6 @@ class Suggest(object):
         self.language_model_3_gram = ngram[2]
         self.kkma = Kkma()
 	self.kkma.morphs(u"initialize")
-        #self.hannanum = Hannanum()
-        #self.hannanum.morphs(u"initialize")
         self.max_iter = 10
         self.ke = hangul.KE()
         self.input_str = ''
@@ -57,7 +55,7 @@ class Suggest(object):
 
             if count == 5:
                 break
-            #print indent_str + ':' + key + '-' + str(value) + '-' + str(iter_count)
+
             if iter_list[-1][-1] + 1 == iter_count:
 	        korean_word[-1].append(korean_word[-1][-1] + key)
             else:
@@ -71,7 +69,6 @@ class Suggest(object):
             iter_list[-1].append(iter_count)
 
             if not value['tag'].split('_')[-1][:2] in ['JK', 'JX', 'JC', 'EF', 'EC', 'ET', 'EM', 'UN', 'MA', 'MD']:
-            #if not value['tag'].split('_')[-1] in ['JC', 'JX', 'JP', 'EF', 'EC', 'ET', 'MA', 'MM']:
                 if not value['tag'] == 'NNG_NNG_NNG' and not value['tag'] == 'NNG_NNG':
 	            self.stupid_backoff_iter(value['tag'], prev, key, indent_str + '----', iter_count + 1, korean_word, iter_list, final_list);
                 else:
@@ -106,13 +103,7 @@ class Suggest(object):
 	    else:
 		prevprev_word = self.ke.change_complete_korean(input_word[-2].encode("utf-8"))
 
-	if prevprev_word == '':
-	    try:
-		result = (self.language_model_2_gram[prev_word], 2)
-	    except KeyError as e1:
-		result = (self.language_model_1_gram, 1)
-	else:
-	    result = self.stupid_backoff(prevprev_word, prev_word)
+	result = self.stupid_backoff(prevprev_word, prev_word)
 
 	count = 0
 	korean_word = []
