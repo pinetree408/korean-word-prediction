@@ -124,10 +124,26 @@
                 $("#input-data").val("");
                 $("#input-data").focus();
               });
+	      $("#suggestion").on("touchstart", "#" + count + " li", function(){
+                $(this).css("background-color", "rgba(0,0,0,0.5)");
+	      });
+	      $("#suggestion").on("touchend", "#" + count + " li", function(){
+                $(this).css("background-color", "white");
+	      });
             } else { 
               $("#suggestion").on("touchstart", "#" + count, {outputList: outputList, count: count}, function(e){
                 for (var i=0; i < e.data.outputList.length; i++) {
                   $("#" + e.data.count + " ul").append(e.data.outputList[i]);
+                }
+                $("#" + e.data.count + " #first").css("background-color", "rgba(0,0,0,0.5)");
+              });
+              $("#suggestion").on("touchmove", "#" + count, function(e){
+                var changedTouch = e.originalEvent.changedTouches[0];
+	        var elem = document.elementFromPoint(changedTouch.clientX, changedTouch.clientY);
+                var elemId = $(elem).attr("id");
+                if (elemId == "first" || elemId == "added") {
+                  $("#suggestion ul li ul li").css("background-color", "white");
+                  $(elem).css("background-color", "rgba(0,0,0,0.5)");
                 }
               });
               $("#suggestion").on("touchend", "#" + count, function(e){
@@ -137,6 +153,7 @@
                 if (elemId == "first" || elemId == "added") {
                   socket.emit("request", {data: $(elem).text()});
                 }
+                $("#suggestion ul li ul li").css("background-color", "white");
                 for (var i=0; i < 2; i++) {
 	          $("#added").remove();
                 }
