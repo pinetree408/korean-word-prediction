@@ -112,7 +112,11 @@
               if (j == 3) {
                 break;
               } else if (j == 0) {
-	        output += "<li id='first'>" + subList[j] + "</li>";
+                if (subListLen == 1) {
+	          output += "<li id='first'>" + subList[j] + "</li>";
+		} else {
+	          output += "<li id='first'>" + subList[j] + "#</li>";
+		}
               } else {
                 outputList.push("<li id='added'>" + subList[j] + "</li>");
               }
@@ -130,7 +134,7 @@
 	      $("#suggestion").on("touchend", "#" + count + " li", function(){
                 $(this).css("background-color", "white");
 	      });
-            } else { 
+            } else {
               $("#suggestion").on("touchstart", "#" + count, {outputList: outputList, count: count}, function(e){
                 for (var i=0; i < e.data.outputList.length; i++) {
                   $("#" + e.data.count + " ul").append(e.data.outputList[i]);
