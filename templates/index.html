@@ -124,7 +124,12 @@
 
             if (outputList.length == 0) {
               $("#suggestion").on("click", "#" + count, function(){
-                socket.emit("request", {data: $(this).text()});
+                var selected = $(this).text();
+                if (selected.indexOf("#") == -1) {
+                  socket.emit("request", {data: selected});
+                } else {
+                  socket.emit("request", {data: selected.slice(0, -1)});
+		}
                 $("#input-data").val("");
                 $("#input-data").focus();
               });
@@ -155,7 +160,12 @@
 	        var elem = document.elementFromPoint(changedTouch.clientX, changedTouch.clientY);
                 var elemId = $(elem).attr("id");
                 if (elemId == "first" || elemId == "added") {
-                  socket.emit("request", {data: $(elem).text()});
+                  var selected = $(elem).text();
+                  if (selected.indexOf("#") == -1) {
+                    socket.emit("request", {data: selected});
+                  } else {
+                    socket.emit("request", {data: selected.slice(0, -1)});
+	          }
                 }
                 $("#suggestion ul li ul li").css("background-color", "white");
                 for (var i=0; i < 2; i++) {
@@ -178,7 +188,12 @@
         if($("#input-data").val() == "") {
           return false;
         }
-        socket.emit("request", {data: $("#input-data").val()});
+        var selected = $("#input-data").val();
+        if (selected.indexOf("#") == -1) {
+          socket.emit("request", {data: selected});
+        } else {
+          socket.emit("request", {data: selected.slice(0, -1)});
+	}
         $("#input-data").val("");
         return false;
       });
