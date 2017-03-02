@@ -25,7 +25,7 @@ class Suggest(object):
 
         return result
 
-    def stupid_backoff_iter(self, tag, prevprev, prev, indent_str, iter_count, korean_word, iter_list, final_list):
+    def stupid_backoff_iter(self, tag, prevprev, prev, iter_count, korean_word, iter_list, final_list):
         if iter_count == self.max_iter:
             if not korean_word[-1][-1] in final_list[-1]:
                 final_list[-1].append(korean_word[-1][-1])
@@ -36,8 +36,6 @@ class Suggest(object):
             if not korean_word[-1][-1] in final_list[-1]:
                 final_list[-1].append(korean_word[-1][-1])
             return
-
-        count = 0
 
         for key, value in result[0].iteritems():
             tag_list = value['tag'].split('_')
@@ -53,7 +51,7 @@ class Suggest(object):
                     if pre_tag_list != tag_list[:-1]:
                         continue
 
-            if count == 5:
+            if len(final_list[-1]) == 5:
                 break
 
             if iter_list[-1][-1] + 1 == iter_count:
@@ -70,14 +68,13 @@ class Suggest(object):
 
             if not value['tag'].split('_')[-1][:2] in ['JK', 'JX', 'JC', 'EF', 'EC', 'ET', 'EM', 'UN', 'MA', 'MD']:
                 if not value['tag'] == 'NNG_NNG_NNG' and not value['tag'] == 'NNG_NNG':
-	            self.stupid_backoff_iter(value['tag'], prev, key, indent_str + '----', iter_count + 1, korean_word, iter_list, final_list);
+	            self.stupid_backoff_iter(value['tag'], prev, key, iter_count + 1, korean_word, iter_list, final_list);
                 else:
                     if not korean_word[-1][-1] in final_list[-1]:
                         final_list[-1].append(korean_word[-1][-1])
             else:
                 if not korean_word[-1][-1] in final_list[-1]:
                     final_list[-1].append(korean_word[-1][-1])
-            count += 1
 
     def suggestion(self, i):
 
@@ -88,49 +85,39 @@ class Suggest(object):
             self.input_str = ''
             return {}
 
-	if self.input_str != '':
-	    self.input_str = self.input_str + ' ' + i
-	else:
-	    self.input_str = i
-
 	input_word = self.kkma.morphs(i)
 	prev_word = self.ke.change_complete_korean(input_word[-1].encode("utf-8"))
 
 	prevprev_word = ''
-	if len(self.input_str) != 0:
-	    if len(input_word) == 1:
+        if len(input_word) > 1:
+            prevprev_word = self.ke.change_complete_korean(input_word[-2].encode("utf-8"))
+        else:
+	    if len(self.input_str.split(' ')) != 0:
 		prevprev_word = self.ke.change_complete_korean(self.kkma.morphs(self.input_str.split(' ')[-1])[-1].encode("utf-8"))
-	    else:
-		prevprev_word = self.ke.change_complete_korean(input_word[-2].encode("utf-8"))
 
 	result = self.stupid_backoff(prevprev_word, prev_word)
 
-	count = 0
 	korean_word = []
 	iter_list = []
 	final_list = []
 	for key, value in result[0].iteritems():
-	    if count == 10:
-		break
 	    korean_word.append([key])
 	    iter_list.append([-1])
 	    final_list.append([])
-	    if not value['tag'].split('_')[-1][:2] in ['JK', 'JX', 'JC', 'EF', 'EC', 'ET', 'EM', 'UN', 'MA', 'MD']:
-		self.stupid_backoff_iter(value['tag'], prev_word, key, "----", 0, korean_word, iter_list, final_list)
-	    else:
-                if not key in final_list[-1]:
-		    final_list[-1].append(key)
-	    count += 1
+            self.stupid_backoff_iter(value['tag'], prev_word, key, 0, korean_word, iter_list, final_list)
 
         final_result = {}
-	for i, item_list in enumerate(final_list):
-	    for j, item in enumerate(item_list):
+	for index, item_list in enumerate(final_list):
+            if len(final_result.keys()) == 3:
+                break
+	    for item in item_list:
 		try:
 		    changed = self.ke.change_english_to_korean(item)
-		    if i in final_result.keys():
-                        final_result[i].append(changed)
+		    if index in final_result.keys():
+                        final_result[index].append(changed)
                     else:
-                        final_result[i] = [changed]
+                        final_result[index] = [changed]
 		except ValueError as e:
 		    continue
+        self.input_str += ' ' + i
         return final_result
