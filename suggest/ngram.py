@@ -15,7 +15,7 @@ def generate():
             if len(keys.split(' ')) != 1:
                 continue
             try:
-                prev_word = ke.change_complete_korean(keys.split('/')[0])
+                prev_word = ke.decompose(keys.split('/')[0])
                 prev_tag = keys.split('/')[1]
             except IndexError as e:
                 continue
@@ -40,9 +40,9 @@ def generate():
 		continue
 
             try:
-                prev_word = ke.change_complete_korean(keys.split(' ')[0].split('/')[0])
+                prev_word = ke.decompose(keys.split(' ')[0].split('/')[0])
 	        prev_tag = keys.split(' ')[0].split('/')[1]
-	        next_word = ke.change_complete_korean(keys.split(' ')[1].split('/')[0])
+	        next_word = ke.decompose(keys.split(' ')[1].split('/')[0])
 	        next_tag = keys.split(' ')[1].split('/')[1]
             except IndexError as e:
                 continue
@@ -68,11 +68,11 @@ def generate():
 	    if len(keys.split(' ')) != 3:
 		continue
             try:
-	        prev_word = ke.change_complete_korean(keys.split(' ')[0].split('/')[0])
+	        prev_word = ke.decompose(keys.split(' ')[0].split('/')[0])
 	        prev_tag = keys.split(' ')[0].split('/')[1]
-	        middle_word = ke.change_complete_korean(keys.split(' ')[1].split('/')[0])
+	        middle_word = ke.decompose(keys.split(' ')[1].split('/')[0])
 	        middle_tag = keys.split(' ')[1].split('/')[1]
-	        next_word = ke.change_complete_korean(keys.split(' ')[2].split('/')[0])
+	        next_word = ke.decompose(keys.split(' ')[2].split('/')[0])
 	        next_tag = keys.split(' ')[2].split('/')[1]
             except IndexError as e:
                 continue

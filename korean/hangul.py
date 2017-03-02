@@ -57,10 +57,11 @@ class KE(object):
         reg_f_item_first = "("+self.reg_f+")"
         reg_f_item_second = "(?=("+self.reg_h+")("+self.reg_b+"))|("+self.reg_f+")"
         reg_f_block = "(" + reg_f_item_first + reg_f_item_second + ")"
+
         self.regex = reg_h_block + reg_b_block + reg_f_block
         self.hangul_reg = re.compile('[^가-힣]+')
 
-    def change_complete_korean(self, word, option=1):
+    def decompose(self, word):
         """chnage korean word to korean letter list
         Args:
             word (str): target word
@@ -88,14 +89,13 @@ class KE(object):
             en_b_char = self.en_b_list[en_b_code]
             en_f_char = self.en_f_list[en_f_code]
 
-            if option == 1:
-                result.append(en_h_char)
-                result.append(en_b_char)
-                if en_f_code != 0:
-                    result.append(en_f_char)
+            result.append(en_h_char)
+            result.append(en_b_char)
+            if en_f_code != 0:
+                result.append(en_f_char)
         return ''.join(result)
 
-    def change_english_to_korean(self, word):
+    def compose(self, word):
         length = len(word)
         temp_word = word
         result = ''

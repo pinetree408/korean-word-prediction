@@ -73,14 +73,14 @@ class Suggest(object):
         final_list = []
 
 	input_word = self.kkma.morphs(i)
-	prev_word = self.ke.change_complete_korean(input_word[-1].encode("utf-8"))
+	prev_word = self.ke.decompose(input_word[-1].encode("utf-8"))
 
 	prevprev_word = ''
         if len(input_word) > 1:
-            prevprev_word = self.ke.change_complete_korean(input_word[-2].encode("utf-8"))
+            prevprev_word = self.ke.decompose(input_word[-2].encode("utf-8"))
         else:
 	    if len(self.input_str.split(' ')) != 0:
-		prevprev_word = self.ke.change_complete_korean(self.kkma.morphs(self.input_str.split(' ')[-1])[-1].encode("utf-8"))
+		prevprev_word = self.ke.decompose(self.kkma.morphs(self.input_str.split(' ')[-1])[-1].encode("utf-8"))
 
         seed_morphemes = self.stupid_backoff(prevprev_word, prev_word)[0]
 
@@ -97,7 +97,7 @@ class Suggest(object):
                 break
 	    for item in item_list:
 		try:
-		    changed = self.ke.change_english_to_korean(item)
+		    changed = self.ke.compose(item)
 		    if index in final_result.keys():
                         final_result[index].append(changed)
                     else:
