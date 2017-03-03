@@ -107,3 +107,51 @@ class Suggest(object):
 
         self.input_str += ' ' + i
 	return final_result
+
+    def correction(self, i):
+
+        if not i:
+            return {}
+
+        final_list = []
+
+        start = self.ke.decompose(i.encode('utf-8'))
+
+        space_divided = self.input_str.split(' ')
+
+        prev_word = ''
+        prevprev_word = ''
+        if len(space_divided) > 0:
+            morphs_list = self.kkma.morphs(space_divided[-1])
+            if len(morphs_list) > 1:
+                prev_word = self.ke.decompose(morphs_list[-1].encode("utf-8"))
+                prevprev_word = self.ke.decompose(morphs_list[-2].encode("utf-8"))
+            elif len(morphs_list) == 1:
+                prev_word = self.ke.decompose(morphs_list[-1].encode("utf-8"))
+
+        seed_morphemes = self.stupid_backoff(prevprev_word, prev_word)[0]
+
+        for key, value in seed_morphemes.iteritems():
+            if not key.startswith(start):
+                continue
+            now_tag_list = value['tag'].split('_')
+	    result_list = [key]
+            merge_list = []
+            self.stupid_backoff_iter(prev_word, key, now_tag_list, result_list, merge_list)
+            final_list.append(merge_list)
+
+        final_result = {}
+	for index, item_list in enumerate(final_list):
+            if len(final_result.keys()) == 3:
+                break
+	    for item in item_list:
+		try:
+		    changed = self.ke.compose(item)
+		    if index in final_result.keys():
+                        final_result[index].append(changed)
+                    else:
+                        final_result[index] = [changed]
+		except ValueError as e:
+		    continue
+
+	return final_result

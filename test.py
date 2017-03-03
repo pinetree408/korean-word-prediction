@@ -14,4 +14,5 @@ print "finish analyze"
 suggest = predict.Suggest(ngram.generate())
 print "initialized"
 
-print suggest.suggestion('교수님이'.decode('utf-8'))
+#print suggest.suggestion('교수님이'.decode('utf-8'))
+print suggest.correction('ㄱ'.decode('utf-8'))

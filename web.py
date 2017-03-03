@@ -48,11 +48,19 @@ def disconnect():
 
 @socketio.on("request", namespace='/mynamespace')
 def request(message):
-    
+
+    if (message['type'] == "word"):
+        predicted = json.dumps(suggest.suggestion(message['data']), ensure_ascii=False)
+        input_str = suggest.input_str
+    else:
+        predicted = json.dumps(suggest.correction(message['data']), ensure_ascii=False)
+        input_str = suggest.input_str + message['data']
+
     emit("response", {
         'type': 'Suggestion',
-        'data': json.dumps(suggest.suggestion(message['data']), ensure_ascii=False),
-        'input': suggest.input_str,
+        'data': predicted,
+        'input': input_str,
+        'type': message['type']
     }, broadcast=True)
 
 if __name__ == '__main__':

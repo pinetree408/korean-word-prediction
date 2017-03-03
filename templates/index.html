@@ -95,14 +95,19 @@
                 var touchedObj = getTouchedObj(e);
                 if (touchedObj.isTouchCorrect) {
                   var selected = getFilteredRequest(touchedObj.elem.text());
-                  socket.emit("request", {data: selected});
+                  socket.emit("request", {
+                    data: selected,
+                    type: "word"
+                  });
                 }
                 $(".result-item").find("li").css("background-color", "white");
                 for (var i=0; i < 2; i++) {
 	          $("#added").remove();
                 }
-                $("#input-data").val("");
-                $("#input-data").focus();
+                if (msg.type == "word") {
+                  $("#input-data").val("");
+                  $("#input-data").focus();
+                }
               }
             }, "#"+item);
         }
@@ -116,9 +121,20 @@
         return false;
       }
       var selected = getFilteredRequest($("#input-data").val());
-      socket.emit("request", {data: selected});
+      socket.emit("request", {
+        data: selected,
+        type: "word"
+      });
       $("#input-data").val("");
       return false;
+    });
+
+    $("#input-data").on("input", function(e){
+      var entered = $(this).val();
+      socket.emit("request", {
+        data: entered,
+        type: "character"
+      });
     });
 
     $("#input-data").focus();
