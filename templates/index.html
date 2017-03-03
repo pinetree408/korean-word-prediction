@@ -20,106 +20,108 @@
     <div id="suggestion"></div>
   </div>
   <script type="text/javascript">
-    $(document).ready(function(){
-      var socket = io.connect("http://" + document.domain + ":" + location.port + "/mynamespace");
-      socket.on('response', function(msg){
-        if (msg.type == 'System') {
-          console.log(msg);
-        } else {
-          $("#input-str").html(msg.input);
-          var dict = $.parseJSON(msg.data);
+    function getTouchedObj(e) {
+      var changedTouch = e.originalEvent.changedTouches[0];
+      var elem = $(document.elementFromPoint(changedTouch.clientX, changedTouch.clientY));
+      var elemId = elem.attr("id");
+      var isTouchCorrect = (elemId == "first" || elemId == "added") ? true : false;
+      return {
+        elem: elem,
+        isTouchCorrect: isTouchCorrect
+      };
+    };
 
-          $(".result-list").remove();
-          $("#suggestion").off("touchstart");
-          $("#suggestion").off("touchmove");
-          $("#suggestion").off("touchend");
+    function getFilteredRequest(text) {
+      var selected = text;
+      if (selected.indexOf("#") != -1) {
+        return selected.slice(0, -1);
+      }
+      return selected;
+    };
 
-          var resultList = $("<ul/>").addClass("result-list");
-          for (var item in dict) {
-            var subList = dict[item];
-            var subListLen = subList.length;
+    var socket = io.connect("http://" + document.domain + ":" + location.port + "/mynamespace");
+    socket.on('response', function(msg){
+      if (msg.type == 'System') {
+        console.log(msg);
+      } else {
+        $("#input-str").html(msg.input);
+        var dict = $.parseJSON(msg.data);
 
-            var resultItem = $("<li/>").addClass("result-item").attr("id", item);
-            var resultItemSubList = $("<ul/>");
+        $(".result-list").remove();
+        $("#suggestion").off("touchstart");
+        $("#suggestion").off("touchmove");
+        $("#suggestion").off("touchend");
 
-            var outputList = [];
-            for (var i=0; i<subListLen; i++) {
-              var resultItemSubItem = $("<li/>");
-              if (i == 0) {
-                resultItemSubItem.attr("id", "first");
-                if (subListLen == 1) {
-                  resultItemSubItem.text(subList[i]);
-                } else {
-                  resultItemSubItem.text(subList[i]+"#");
-                }
-                resultItemSubList.append(resultItemSubItem);
-              } else {
-                resultItemSubItem.attr("id", "added").text(subList[i]);
-                outputList.push(resultItemSubItem);
-              }
+        var resultList = $("<ul/>").addClass("result-list");
+        for (var item in dict) {
+          var subList = dict[item];
+          var subListLen = subList.length;
+
+          var resultItem = $("<li/>").addClass("result-item").attr("id", item);
+          var resultItemSubList = $("<ul/>");
+
+          var outputList = [];
+          for (var i=0; i<subListLen; i++) {
+            var resultItemSubItem = $("<li/>");
+            if (i == 0) {
+              var subItemText = subListLen == 1 ? subList[i] : subList[i]+"#";
+              resultItemSubItem.attr("id", "first").text(subItemText);
+              resultItemSubList.append(resultItemSubItem);
+            } else {
+              resultItemSubItem.attr("id", "added").text(subList[i]);
+              outputList.push(resultItemSubItem);
             }
-            resultItem.append(resultItemSubList);
-            resultList.append(resultItem);
-
-            $("#suggestion")
-              .on("touchstart", "#"+item, {outputList: outputList}, function(e){
-                for (var i=0; i < e.data.outputList.length; i++) {
-                  $(this).find("ul").append(e.data.outputList[i]);
-                }
-                $(this).find("#first").css("background-color", "rgba(0,0,0,0.5)");
-              })
-              .on({
-                touchmove: function(e){
-                  var changedTouch = e.originalEvent.changedTouches[0];
-                  var elem = document.elementFromPoint(changedTouch.clientX, changedTouch.clientY);
-                  var elemId = $(elem).attr("id");
-                  if (elemId == "first" || elemId == "added") {
-                    $(".result-item").find("li").css("background-color", "white");
-                    $(elem).css("background-color", "rgba(0,0,0,0.5)");
-                  }
-                },
-                touchend: function(e){
-                  var changedTouch = e.originalEvent.changedTouches[0];
-                  var elem = document.elementFromPoint(changedTouch.clientX, changedTouch.clientY);
-                  var elemId = $(elem).attr("id");
-                  if (elemId == "first" || elemId == "added") {
-                    var selected = $(elem).text();
-                    if (selected.indexOf("#") == -1) {
-                      socket.emit("request", {data: selected});
-                    } else {
-                      socket.emit("request", {data: selected.slice(0, -1)});
-                    }
-                  }
-                  $(".result-item").find("li").css("background-color", "white");
-                  for (var i=0; i < 2; i++) {
-	            $("#added").remove();
-                  }
-                  $("#input-data").val("");
-                  $("#input-data").focus();
-                }
-              }, "#"+item);
           }
+          resultItem.append(resultItemSubList);
+          resultList.append(resultItem);
 
-          $("#suggestion").append(resultList);
+          $("#suggestion")
+            .on("touchstart", "#"+item, {outputList: outputList}, function(e){
+              var touched = $(this);
+              $.each(e.data.outputList, function(index, element) {
+                touched.find("ul").append(element);
+              });
+              touched.find("#first").css("background-color", "rgba(0,0,0,0.5)");
+            })
+            .on({
+              touchmove: function(e){
+                var touchedObj = getTouchedObj(e);
+                if (touchedObj.isTouchCorrect) {
+                  $(".result-item").find("li").css("background-color", "white");
+                  touchedObj.elem.css("background-color", "rgba(0,0,0,0.5)");
+                }
+              },
+              touchend: function(e){
+                var touchedObj = getTouchedObj(e);
+                if (touchedObj.isTouchCorrect) {
+                  var selected = getFilteredRequest(touchedObj.elem.text());
+                  socket.emit("request", {data: selected});
+                }
+                $(".result-item").find("li").css("background-color", "white");
+                for (var i=0; i < 2; i++) {
+	          $("#added").remove();
+                }
+                $("#input-data").val("");
+                $("#input-data").focus();
+              }
+            }, "#"+item);
         }
-      });
 
-      $("form").submit(function(event){
-        if($("#input-data").val() == "") {
-          return false;
-        }
-        var selected = $("#input-data").val();
-        if (selected.indexOf("#") == -1) {
-          socket.emit("request", {data: selected});
-        } else {
-          socket.emit("request", {data: selected.slice(0, -1)});
-        }
-        $("#input-data").val("");
-        return false;
-      });
-
-      $("#input-data").focus();
+        $("#suggestion").append(resultList);
+      }
     });
+
+    $("form").submit(function(event){
+      if($("#input-data").val() == "") {
+        return false;
+      }
+      var selected = getFilteredRequest($("#input-data").val());
+      socket.emit("request", {data: selected});
+      $("#input-data").val("");
+      return false;
+    });
+
+    $("#input-data").focus();
   </script>
 </body>
 </html>
