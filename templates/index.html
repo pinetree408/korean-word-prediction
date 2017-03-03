@@ -29,92 +29,78 @@
           $("#input-str").html(msg.input);
           var dict = $.parseJSON(msg.data);
 
-          $("#suggestion").off("click");
+          $(".result-list").remove();
           $("#suggestion").off("touchstart");
+          $("#suggestion").off("touchmove");
           $("#suggestion").off("touchend");
 
-          var output = "<ul id='result_list'>";
-          var count = 0;
+          var resultList = $("<ul/>").addClass("result-list");
           for (var item in dict) {
-            if (count > 2) {
-              break;
-            }
             var subList = dict[item];
             var subListLen = subList.length;
-            output += "<li class='result_item' " + "id='" + count + "'><ul>";
+
+            var resultItem = $("<li/>").addClass("result-item").attr("id", item);
+            var resultItemSubList = $("<ul/>");
+
             var outputList = [];
-            for (var j=0; j<subListLen; j++) {
-              if (j == 3) {
-                break;
-              } else if (j == 0) {
+            for (var i=0; i<subListLen; i++) {
+              var resultItemSubItem = $("<li/>");
+              if (i == 0) {
+                resultItemSubItem.attr("id", "first");
                 if (subListLen == 1) {
-	          output += "<li id='first'>" + subList[j] + "</li>";
-		} else {
-	          output += "<li id='first'>" + subList[j] + "#</li>";
-		}
+                  resultItemSubItem.text(subList[i]);
+                } else {
+                  resultItemSubItem.text(subList[i]+"#");
+                }
+                resultItemSubList.append(resultItemSubItem);
               } else {
-                outputList.push("<li id='added'>" + subList[j] + "</li>");
+                resultItemSubItem.attr("id", "added").text(subList[i]);
+                outputList.push(resultItemSubItem);
               }
             }
+            resultItem.append(resultItemSubList);
+            resultList.append(resultItem);
 
-            if (outputList.length == 0) {
-              $("#suggestion").on("click", "#" + count, function(){
-                var selected = $(this).text();
-                if (selected.indexOf("#") == -1) {
-                  socket.emit("request", {data: selected});
-                } else {
-                  socket.emit("request", {data: selected.slice(0, -1)});
-		}
-                $("#input-data").val("");
-                $("#input-data").focus();
-              });
-	      $("#suggestion").on("touchstart", "#" + count + " li", function(){
-                $(this).css("background-color", "rgba(0,0,0,0.5)");
-	      });
-	      $("#suggestion").on("touchend", "#" + count + " li", function(){
-                $(this).css("background-color", "white");
-	      });
-            } else {
-              $("#suggestion").on("touchstart", "#" + count, {outputList: outputList, count: count}, function(e){
+            $("#suggestion")
+              .on("touchstart", "#"+item, {outputList: outputList}, function(e){
                 for (var i=0; i < e.data.outputList.length; i++) {
-                  $("#" + e.data.count + " ul").append(e.data.outputList[i]);
+                  $(this).find("ul").append(e.data.outputList[i]);
                 }
-                $("#" + e.data.count + " #first").css("background-color", "rgba(0,0,0,0.5)");
-              });
-              $("#suggestion").on("touchmove", "#" + count, function(e){
-                var changedTouch = e.originalEvent.changedTouches[0];
-	        var elem = document.elementFromPoint(changedTouch.clientX, changedTouch.clientY);
-                var elemId = $(elem).attr("id");
-                if (elemId == "first" || elemId == "added") {
-                  $("#suggestion ul li ul li").css("background-color", "white");
-                  $(elem).css("background-color", "rgba(0,0,0,0.5)");
+                $(this).find("#first").css("background-color", "rgba(0,0,0,0.5)");
+              })
+              .on({
+                touchmove: function(e){
+                  var changedTouch = e.originalEvent.changedTouches[0];
+                  var elem = document.elementFromPoint(changedTouch.clientX, changedTouch.clientY);
+                  var elemId = $(elem).attr("id");
+                  if (elemId == "first" || elemId == "added") {
+                    $(".result-item").find("li").css("background-color", "white");
+                    $(elem).css("background-color", "rgba(0,0,0,0.5)");
+                  }
+                },
+                touchend: function(e){
+                  var changedTouch = e.originalEvent.changedTouches[0];
+                  var elem = document.elementFromPoint(changedTouch.clientX, changedTouch.clientY);
+                  var elemId = $(elem).attr("id");
+                  if (elemId == "first" || elemId == "added") {
+                    var selected = $(elem).text();
+                    if (selected.indexOf("#") == -1) {
+                      socket.emit("request", {data: selected});
+                    } else {
+                      socket.emit("request", {data: selected.slice(0, -1)});
+                    }
+                  }
+                  $(".result-item").find("li").css("background-color", "white");
+                  for (var i=0; i < 2; i++) {
+	            $("#added").remove();
+                  }
+                  $("#input-data").val("");
+                  $("#input-data").focus();
                 }
-              });
-              $("#suggestion").on("touchend", "#" + count, function(e){
-                var changedTouch = e.originalEvent.changedTouches[0];
-	        var elem = document.elementFromPoint(changedTouch.clientX, changedTouch.clientY);
-                var elemId = $(elem).attr("id");
-                if (elemId == "first" || elemId == "added") {
-                  var selected = $(elem).text();
-                  if (selected.indexOf("#") == -1) {
-                    socket.emit("request", {data: selected});
-                  } else {
-                    socket.emit("request", {data: selected.slice(0, -1)});
-	          }
-                }
-                $("#suggestion ul li ul li").css("background-color", "white");
-                for (var i=0; i < 2; i++) {
-	          $("#added").remove();
-                }
-                $("#input-data").val("");
-                $("#input-data").focus();
-              });
-	    }
-	    output += "</ul></li>";
-            count++;
-	  }
-	  output += "</ul>";
-	  $("#suggestion").html(output);
+              }, "#"+item);
+          }
+
+          $("#suggestion").append(resultList);
         }
       });
 
@@ -127,10 +113,11 @@
           socket.emit("request", {data: selected});
         } else {
           socket.emit("request", {data: selected.slice(0, -1)});
-	}
+        }
         $("#input-data").val("");
         return false;
       });
+
       $("#input-data").focus();
     });
   </script>

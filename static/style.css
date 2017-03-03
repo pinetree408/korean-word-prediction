@@ -48,24 +48,24 @@ input {
   margin: 2px;
 }
 
-#result_list {
+.result-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-#result_list ul {
+.result-list ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.result_item {
+.result-item {
   float: left;
   width: 33%;
 }
 
-.result_item li {
+.result-item li {
   text-align: center;
   border: 1px solid black;
   height: 30px;
