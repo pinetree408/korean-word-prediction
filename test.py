@@ -14,5 +14,11 @@ print "finish analyze"
 suggest = predict.Suggest(ngram.generate())
 print "initialized"
 
-#print suggest.suggestion('교수님이'.decode('utf-8'))
-print suggest.correction('ㄱ'.decode('utf-8'))
+def pretty_print(dic):
+    for key, value in dic.iteritems():
+        print key
+        for item in value:
+            print "---" + item.encode('utf-8')
+
+pretty_print(suggest.suggestion('교수님이'.decode('utf-8')))
+#pretty_print(suggest.correction('ㄱ'.decode('utf-8')))
