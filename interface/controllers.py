@@ -1,26 +1,12 @@
 # -*- coding: utf-8 -*-
-import os
-from flask import Flask, render_template, session
-from flask_socketio import SocketIO, emit
-from suggest import ngram, predict
-from corpus import analyze
+from flask import render_template, session
+from flask_socketio import emit
 
+from interface import app, socketio, suggest
+
+import os
 import json
 
-app = Flask(__name__)
-app.debug = True
-app.secret_key = "secret"
-socketio = SocketIO(app)
-
-if not os.path.exists('lm/'):
-    os.makedirs('lm/')
-
-if not "language_model_1_gram.txt" in os.listdir("lm/"):
-    analyze.generater("target/", 'kakao')
-print "finish analyze"
-
-suggest = predict.Suggest(ngram.generate())
-print "initialized"
 
 @app.before_request
 def before_request():
@@ -62,6 +48,3 @@ def request(message):
         'input': input_str,
         'type': message['type']
     }, broadcast=True)
-
-if __name__ == '__main__':
-    socketio.run(app, host="0.0.0.0")
