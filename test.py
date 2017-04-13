@@ -4,21 +4,20 @@ from corpus import analyze
 
 import os
 
-if not os.path.exists('lm/'):
-    os.makedirs('lm/')
+if __name__ == "__main__":
+    if not os.path.exists('lm/'):
+        os.makedirs('lm/')
 
-if not "language_model_1_gram.txt" in os.listdir("lm/"):
-    analyze.generater("target/", 'kakao')
-print "finish analyze"
+    #if not "language_model_1_gram.txt" in os.listdir("lm/"):
+    analyze.generater_parallel("target/", 'wiki')
+    print "finish analyze"
+    suggest = predict.Suggest(ngram.generate())
+    print "initialized"
 
-suggest = predict.Suggest(ngram.generate())
-print "initialized"
+    def pretty_print(dic):
+        for key, value in dic.iteritems():
+            print key
+            for item in value:
+                print "---" + item.encode('utf-8')
 
-def pretty_print(dic):
-    for key, value in dic.iteritems():
-        print key
-        for item in value:
-            print "---" + item.encode('utf-8')
-
-pretty_print(suggest.suggestion('교수님이'.decode('utf-8')))
-#pretty_print(suggest.correction('ㄱ'.decode('utf-8')))
+    pretty_print(suggest.suggestion('교수님이'.decode('utf-8')))
