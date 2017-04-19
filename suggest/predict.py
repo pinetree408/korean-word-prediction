@@ -69,7 +69,7 @@ class Suggest(object):
         if i.lower() == 'reset':
             self.input_str = ''
             return {}
-
+        self.input_str = i
         final_list = []
 
 	input_word = self.kkma.morphs(i)
@@ -117,6 +117,7 @@ class Suggest(object):
 
         start = self.ke.decompose(i.encode('utf-8'))
 
+        self.input_str = i
         space_divided = self.input_str.split(' ')
 
         prev_word = ''
