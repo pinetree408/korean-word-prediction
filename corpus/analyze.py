@@ -165,7 +165,7 @@ def generater_parallel(target_path, option):
             with open(raw_target_path + raw_target + '/' + target, 'r') as raw_file:
                 count = 0
                 for item in raw_file:
-                    if count == 2000:
+                    if count == 5000:
                         break
                     update_dict(lm_list[i], item[:-1])
                     count += 1

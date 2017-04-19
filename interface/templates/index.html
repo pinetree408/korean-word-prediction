@@ -138,9 +138,14 @@
 
     $("#input-data").on("input", function(e){
       var entered = $(this).val();
+      var jaList = ['ㄱ', 'ㄴ', 'ㄷ', 'ㄹ', 'ㅁ'];
+      var requestType = "character";
+      if (jaList.indexOf(entered) == -1) {
+        requestType = "word";
+      }
       socket.emit("request", {
         data: entered,
-        type: "character"
+        type: requestType
       });
     });
 

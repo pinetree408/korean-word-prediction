@@ -6,6 +6,7 @@ from interface import app, socketio, suggest
 
 import os
 import json
+import time
 
 
 @app.before_request
@@ -35,6 +36,7 @@ def disconnect():
 @socketio.on("request", namespace='/mynamespace')
 def request(message):
 
+    start_time = time.time()
     if (message['type'] == "word"):
         predicted = json.dumps(suggest.suggestion(message['data']), ensure_ascii=False)
         input_str = suggest.input_str
@@ -42,6 +44,7 @@ def request(message):
         predicted = json.dumps(suggest.correction(message['data']), ensure_ascii=False)
         input_str = suggest.input_str + message['data']
 
+    print time.time() - start_time
     emit("response", {
         'type': 'Suggestion',
         'data': predicted,
