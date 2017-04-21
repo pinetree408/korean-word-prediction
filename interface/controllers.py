@@ -42,7 +42,7 @@ def request(message):
         input_str = suggest.input_str
     else:
         predicted = json.dumps(suggest.correction(message['data']), ensure_ascii=False)
-        input_str = suggest.input_str + message['data']
+        input_str = suggest.input_str
 
     print time.time() - start_time
     emit("response", {

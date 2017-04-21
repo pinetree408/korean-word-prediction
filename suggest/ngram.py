@@ -55,10 +55,10 @@ def generate():
 		language_model_2_gram[prev_word] = {next_word : {'tag': prev_tag + '_' + next_tag, 'value': value}}
 
     for key, value in language_model_2_gram.iteritems():
-	sorted_value = sorted(value.items(), key=lambda x: x[1]['value'])
-	sorted_value.reverse()
-	del language_model_2_gram[key]
-	language_model_2_gram[key] = OrderedDict(sorted_value)
+        sorted_value = sorted(value.items(), key=lambda x: x[1]['value'])
+        sorted_value.reverse()
+        del language_model_2_gram[key]
+        language_model_2_gram[key] = OrderedDict(sorted_value)
 
     print "set lanaguae model trigram"
     language_model_3_gram = {}
@@ -89,9 +89,9 @@ def generate():
 
     for key, value in language_model_3_gram.iteritems():
 	for key1, value1 in language_model_3_gram[key].iteritems():
-	    sorted_value = sorted(value1.items(), key=lambda x: x[1]['value'])
-	    sorted_value.reverse()
-	    del language_model_3_gram[key][key1]
-	    language_model_3_gram[key][key1] = OrderedDict(sorted_value)
+            sorted_value = sorted(value1.items(), key=lambda x: x[1]['value'])
+            sorted_value.reverse()
+            del language_model_3_gram[key][key1]
+            language_model_3_gram[key][key1] = OrderedDict(sorted_value)
     return [language_model_1_gram, language_model_2_gram, language_model_3_gram]
 

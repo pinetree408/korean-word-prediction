@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*- 
 from konlpy.tag import Kkma
 from korean import hangul
+from collections import OrderedDict
+
 
 class Suggest(object):
 
@@ -30,12 +32,20 @@ class Suggest(object):
     def stupid_backoff(self, prevprev, prev):
         try:
             result = [self.language_model_3_gram[prevprev][prev], 3]
+            if len(result[0]) < 3:
+                try:
+                    result[0].update(self.language_model_2_gram[prev])
+                    if len(result[0]) < 3:
+                        result[0].update(self.language_model_1_gram)
+                except KeyError as e2:
+                    result[0].update(self.language_model_1_gram)
         except KeyError as e1:
             try:
                 result = [self.language_model_2_gram[prev], 2]
+                if len(result[0]) < 3:
+                    result[0].update(self.language_model_1_gram)
             except KeyError as e2:
                 result = [self.language_model_1_gram, 1]
-
         return result
 
     def stupid_backoff_iter(self, prevprev, prev, pre_tag_list, result_list, merge_list):

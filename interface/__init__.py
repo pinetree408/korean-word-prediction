@@ -12,13 +12,6 @@ app.secret_key = "secret"
 
 socketio = SocketIO(app)
 
-if not os.path.exists('lm/'):
-    os.makedirs('lm/')
-
-#if not "language_model_1_gram.txt" in os.listdir("lm/"):
-analyze.generater_parallel("target/", 'wiki')
-print "finish analyze"
-
 suggest = predict.Suggest(ngram.generate())
 print "initialized"
 
