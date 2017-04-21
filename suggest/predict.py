@@ -88,7 +88,8 @@ class Suggest(object):
             now_tag_list = value['tag'].split('_')
 	    result_list = [key]
             merge_list = []
-            self.stupid_backoff_iter(prev_word, key, now_tag_list, result_list, merge_list)
+            if not now_tag_list[-1][:2] in self.end_tag_list:
+                self.stupid_backoff_iter(prev_word, key, now_tag_list, result_list, merge_list)
             final_list.append(merge_list)
 
         final_result = {}
@@ -105,7 +106,6 @@ class Suggest(object):
 		except ValueError as e:
 		    continue
 
-        self.input_str += ' ' + i
 	return final_result
 
     def correction(self, i):
@@ -138,7 +138,8 @@ class Suggest(object):
             now_tag_list = value['tag'].split('_')
 	    result_list = [key]
             merge_list = []
-            self.stupid_backoff_iter(prev_word, key, now_tag_list, result_list, merge_list)
+            if not now_tag_list[-1][:2] in self.end_tag_list:
+                self.stupid_backoff_iter(prev_word, key, now_tag_list, result_list, merge_list)
             final_list.append(merge_list)
 
         final_result = {}
