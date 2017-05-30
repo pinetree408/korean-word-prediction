@@ -1,5 +1,5 @@
-### research
-
+### #research
+### python server of korean word suggestion system
 ## korean word prediction
 
 ### Data structure
