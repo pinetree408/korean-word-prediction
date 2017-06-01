@@ -157,20 +157,25 @@ def generater_parallel(target_path, option):
     '''
 
     raw_target_path = "lm_raw/"
-    raw_target_path_list = ["uni", "bi", "tri"]
+    #raw_target_path_list = ["uni", "bi", "tri"]
+    raw_target_path_list = ["uni"]
 
     for i, raw_target in enumerate(raw_target_path_list):
         print raw_target
         for target in os.listdir(raw_target_path + raw_target):
+            print target
             with open(raw_target_path + raw_target + '/' + target, 'r') as raw_file:
-                count = 0
                 for item in raw_file:
-                    if count == 2000:
-                        break
                     update_dict(lm_list[i], item[:-1])
-                    count += 1
 
     print "start make lm"
+    with open("lm/language_model_1_gram.txt", 'w') as file_write_1:
+
+        for key, value in language_model_1_gram.iteritems():
+            file_write_1.write(key + ':' + str(value) + "\n")
+    print "end make lm"
+
+    '''
     with open("lm/language_model_1_gram.txt", 'w') as file_write_1,\
         open("lm/language_model_2_gram.txt", 'w') as file_write_2,\
         open("lm/language_model_3_gram.txt", 'w') as file_write_3:
@@ -181,3 +186,4 @@ def generater_parallel(target_path, option):
             file_write_2.write(key + ':' + str(value) + "\n")
         for key, value in language_model_3_gram.iteritems():
             file_write_3.write(key + ':' + str(value) + "\n")
+    '''

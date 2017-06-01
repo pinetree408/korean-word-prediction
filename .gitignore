@@ -22,5 +22,5 @@ node_modules/
 #*.txt
 #!requirements.txt
 *.csv
-lm/
+lm_raw/
 target/
