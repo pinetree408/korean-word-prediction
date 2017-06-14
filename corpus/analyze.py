@@ -137,7 +137,8 @@ def generater_parallel(target_path, option):
     language_model_1_gram = {}
     language_model_2_gram = {}
     language_model_3_gram = {}
-    lm_list = [language_model_1_gram, language_model_2_gram, language_model_3_gram]
+    #lm_list = [language_model_1_gram, language_model_2_gram, language_model_3_gram]
+    lm_list = [language_model_2_gram]
 
     '''
     for target in target_list:
@@ -158,7 +159,7 @@ def generater_parallel(target_path, option):
 
     raw_target_path = "lm_raw/"
     #raw_target_path_list = ["uni", "bi", "tri"]
-    raw_target_path_list = ["uni"]
+    raw_target_path_list = ["bi"]
 
     for i, raw_target in enumerate(raw_target_path_list):
         print raw_target
@@ -169,10 +170,10 @@ def generater_parallel(target_path, option):
                     update_dict(lm_list[i], item[:-1])
 
     print "start make lm"
-    with open("lm/language_model_1_gram.txt", 'w') as file_write_1:
+    with open("lm/language_model_2_gram.txt", 'w') as file_write_2:
 
-        for key, value in language_model_1_gram.iteritems():
-            file_write_1.write(key + ':' + str(value) + "\n")
+        for key, value in language_model_2_gram.iteritems():
+            file_write_2.write(key + ':' + str(value) + "\n")
     print "end make lm"
 
     '''
