@@ -1,6 +1,6 @@
-### #research
-### python server of korean word suggestion system
+### #research : hci
 ## korean word prediction
+> python server of korean word suggestion system
 
 ### Data structure
 ```python
